@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import CompletedTask from './CompletedTask';
 import Options from './Options';
 
 const Body = () => {
   const defaultState = JSON.parse(localStorage.getItem('items')) ? JSON.parse(localStorage.getItem('items')) : [];
   const [options, setOptions] = useState(defaultState);
+  const [complete, setComplete] = useState(JSON.parse(localStorage.getItem('completeList')) || []);
   let [isValuePresent, setValuePresent] = useState(false);
 
   const validateInput = (option) => {
@@ -33,6 +35,15 @@ const Body = () => {
     }));
   }
 
+  const handleComplete = (id) => {
+    setComplete([...complete, options[id] ]);
+    handleDelete(id);
+  }
+
+  useEffect(() => {
+    localStorage.setItem('completeList', JSON.stringify(complete));
+  }, [complete]);
+
   useEffect(() => {
     localStorage.setItem('items', JSON.stringify(options));
   }, [options]);
@@ -49,11 +60,13 @@ const Body = () => {
           </form>
 
           <button className='absolute bottom-0 text-[1.25rem] font-extrabold p-2 rounded-[5px] bg-black text-white right-0' onClick={handleAddOption}> Add </button>
-  
+
         </div>
 
-        <Options options={options} handleDelete={handleDelete}/>
-
+        <Options options={options} handleDelete={handleDelete} handleComplete={handleComplete}/>
+        { complete.length ? 
+          <CompletedTask complete={complete} /> : ''
+        }
       </div>
     </div>
   )
